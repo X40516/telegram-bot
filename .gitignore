@@ -1,0 +1,6 @@
+.env
+orders.json
+__pycache__/
+*.pyc
+venv/
+.venv/
