@@ -17,6 +17,8 @@ from datetime import datetime
 
 from dotenv import load_dotenv
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
+
+from chat_responses import get_response
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -57,7 +59,7 @@ def save_order(order: dict) -> None:
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     text = (
-        "Salom! \U0001F44B Men ko'p funksiyali botman.\n\n"
+        "Salom! 👋 Men ko'p funksiyali botman.\n\n"
         "Buyruqlar:\n"
         "/order - Buyurtma / so'rovnoma berish\n"
         "/remind <daqiqa> <matn> - Eslatma qo'yish\n"
@@ -75,8 +77,8 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 async def echo_reply(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user_text = update.message.text
-    # Bu yerga o'zingizning javob logikangizni yoki AI chaqiruvini qo'shishingiz mumkin
-    await update.message.reply_text(f"Siz yozdingiz: {user_text}")
+    reply = get_response(user_text)
+    await update.message.reply_text(reply)
 
 
 # ---------- Buyurtma / so'rovnoma (Conversation) ----------
@@ -118,7 +120,7 @@ async def order_product(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
     save_order(order)
 
     await update.message.reply_text(
-        "Rahmat! Buyurtmangiz qabul qilindi \u2705\n\n"
+        "Rahmat! Buyurtmangiz qabul qilindi ✅\n\n"
         f"Ism: {order['name']}\n"
         f"Telefon: {order['phone']}\n"
         f"Mahsulot: {order['product']}"
@@ -135,7 +137,7 @@ async def order_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
 
 async def remind_callback(context: ContextTypes.DEFAULT_TYPE) -> None:
     job = context.job
-    await context.bot.send_message(chat_id=job.chat_id, text=f"\u23F0 Eslatma: {job.data}")
+    await context.bot.send_message(chat_id=job.chat_id, text=f"⏰ Eslatma: {job.data}")
 
 
 async def remind(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -155,7 +157,7 @@ async def remind(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.job_queue.run_once(
         remind_callback, minutes * 60, chat_id=chat_id, data=text
     )
-    await update.message.reply_text(f"\u2705 {minutes} daqiqadan keyin eslataman: {text}")
+    await update.message.reply_text(f"✅ {minutes} daqiqadan keyin eslataman: {text}")
 
 
 # ---------- Asosiy ishga tushirish ----------
